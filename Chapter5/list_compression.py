@@ -26,6 +26,7 @@ from pickle import dumps
 # 165 bytes compressed
 PEOPLE: List[str] = ["Michael", "Sarah", "Joshua", "Narine", "David", "Sajid", "Melanie", "Daniel", "Wei", "Dean", "Brian", "Murat", "Lisa"]
 
+print(getsizeof(compress(dumps(PEOPLE))))
 
 class ListCompression(Chromosome):
     def __init__(self, lst: List[Any]) -> None:
@@ -63,10 +64,14 @@ class ListCompression(Chromosome):
 
 if __name__ == "__main__":
     initial_population: List[ListCompression] = [ListCompression.random_instance() for _ in range(100)]
-    ga: GeneticAlgorithm[ListCompression] = GeneticAlgorithm(initial_population=initial_population, threshold=1.0, max_generations = 100, mutation_chance = 0.2, crossover_chance = 0.7, selection_type=GeneticAlgorithm.SelectionType.TOURNAMENT)
+    ga: GeneticAlgorithm[ListCompression] = GeneticAlgorithm(initial_population=initial_population, threshold=1.0, max_generations = 1000, mutation_chance = 0.2, crossover_chance = 0.7, selection_type=GeneticAlgorithm.SelectionType.TOURNAMENT)
     result: ListCompression = ga.run()
     print(result)
 
 # Best I found
 # 546th generation with 1000 individuals in each
 # Order: ['Wei', 'Michael', 'Melanie', 'Daniel', 'Joshua', 'Narine', 'Lisa', 'Dean', 'Brian', 'David', 'Sajid', 'Sarah', 'Murat'] Bytes: 159
+
+# Order: ['Wei', 'Joshua', 'Narine', 'Dean', 'Brian', 'Melanie', 'Lisa', 'Daniel', 'Murat', 'Michael', 'David', 'Sajid', 'Sarah'] Bytes: 137
+
+# Order: ['Brian', 'Dean', 'Joshua', 'Lisa', 'Murat', 'Sarah', 'Sajid', 'David', 'Melanie', 'Narine', 'Daniel', 'Michael', 'Wei'] Bytes: 136

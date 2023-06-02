@@ -40,3 +40,16 @@ if __name__ == "__main__":
     print("Here are the potential mnemonics:")
     for mnemonic in possible_mnemonics(phone_number):
         print("".join(mnemonic))
+
+# Enter a phone number:1440787
+# Here are the potential mnemonics:
+# 1gg0ptp
+# 1gg0ptq
+# 1gg0ptr
+# 1gg0pts
+# 1gg0pup
+# 1gg0puq
+# 1gg0pur
+# 1gg0pus
+# 1gg0pvp
+# ......

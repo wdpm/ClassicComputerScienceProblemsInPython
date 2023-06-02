@@ -26,6 +26,7 @@ gene_str: str = "ACGTGGCTCTCTAACGTACGTACGTACGGGGTTTATATATACCCTAGGACTCCCTTT"
 def string_to_gene(s: str) -> Gene:
     gene: Gene = []
     for i in range(0, len(s), 3):
+        # 末尾如果不够3个，那就抛弃这1个或者2个
         if (i + 2) >= len(s):  # don't run off end!
             return gene
         #  initialize codon out of three nucleotides

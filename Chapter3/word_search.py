@@ -37,6 +37,13 @@ def display_grid(grid: Grid) -> None:
 
 
 def generate_domain(word: str, grid: Grid) -> List[List[GridLocation]]:
+    """
+    保存一个特定word往右、右下、下、左下四个方向的可能摆放的位置
+
+    :param word:
+    :param grid:
+    :return:
+    """
     domain: List[List[GridLocation]] = []
     height: int = len(grid)
     width: int = len(grid[0])
@@ -45,6 +52,7 @@ def generate_domain(word: str, grid: Grid) -> List[List[GridLocation]]:
         for col in range(width):
             columns: range = range(col, col + length)
             rows: range = range(row, row + length)
+            # 检测单词放下去是否会超出grid的边界
             if col + length <= width:
                 # left to right
                 domain.append([GridLocation(row, c) for c in columns])
@@ -67,17 +75,28 @@ class WordSearchConstraint(Constraint[str, List[GridLocation]]):
 
     def satisfied(self, assignment: Dict[str, List[GridLocation]]) -> bool:
         # if there are any duplicates grid locations then there is an overlap
+        # 不允许坐标点列表中有一个点是重复的，也就是没有交集。
         all_locations = [locs for values in assignment.values() for locs in values]
         return len(set(all_locations)) == len(all_locations)
+
+        # 习题1：如何支持单词的字母重叠？
+        # 判断所有变量被赋值后，检测是否有交集的点，有就是true，没有就是false
 
 
 if __name__ == "__main__":
     grid: Grid = generate_grid(9, 9)
+    # 变量
     words: List[str] = ["MATTHEW", "JOE", "MARY", "SARAH", "SALLY"]
+
+    # 变量对应的值域
     locations: Dict[str, List[List[GridLocation]]] = {}
     for word in words:
         locations[word] = generate_domain(word, grid)
+
+    # print(locations)
+
     csp: CSP[str, List[GridLocation]] = CSP(words, locations)
+    # 约束是什么？
     csp.add_constraint(WordSearchConstraint(words))
     solution: Optional[Dict[str, List[GridLocation]]] = csp.backtracking_search()
     if solution is None:

@@ -24,17 +24,30 @@ T = TypeVar('T', bound='Chromosome') # for returning self
 class Chromosome(ABC):
     @abstractmethod
     def fitness(self) -> float:
+        """
+        适应度函数
+        """
         ...
 
     @classmethod
     @abstractmethod
     def random_instance(cls: Type[T]) -> T:
+        """
+        随机实例
+        """
         ...
 
     @abstractmethod
     def crossover(self: T, other: T) -> Tuple[T, T]:
+        """
+        交换
+        :param other:
+        """
         ...
 
     @abstractmethod
     def mutate(self) -> None:
+        """
+        变异
+        """
         ...

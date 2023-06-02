@@ -26,7 +26,7 @@ class SimpleEquation(Chromosome):
         self.x: int = x
         self.y: int = y
 
-    def fitness(self) -> float: # 6x - x^2 + 4y - y^2
+    def fitness(self) -> float:  # 6x - x^2 + 4y - y^2
         return 6 * self.x - self.x * self.x + 4 * self.y - self.y * self.y
 
     @classmethod
@@ -36,17 +36,18 @@ class SimpleEquation(Chromosome):
     def crossover(self, other: SimpleEquation) -> Tuple[SimpleEquation, SimpleEquation]:
         child1: SimpleEquation = deepcopy(self)
         child2: SimpleEquation = deepcopy(other)
+        # 这里仅仅交换了Y，没有交换X
         child1.y = other.y
         child2.y = self.y
         return child1, child2
 
     def mutate(self) -> None:
-        if random() > 0.5: # mutate x
+        if random() > 0.5:  # mutate x
             if random() > 0.5:
                 self.x += 1
             else:
                 self.x -= 1
-        else: # otherwise mutate y
+        else:  # otherwise mutate y
             if random() > 0.5:
                 self.y += 1
             else:
@@ -58,6 +59,25 @@ class SimpleEquation(Chromosome):
 
 if __name__ == "__main__":
     initial_population: List[SimpleEquation] = [SimpleEquation.random_instance() for _ in range(20)]
-    ga: GeneticAlgorithm[SimpleEquation] = GeneticAlgorithm(initial_population=initial_population, threshold=13.0, max_generations = 100, mutation_chance = 0.1, crossover_chance = 0.7)
+    # threshold=13.0 这个13其实就是该函数微分为0时的极大值。
+    ga: GeneticAlgorithm[SimpleEquation] = GeneticAlgorithm(initial_population=initial_population, threshold=13.0,
+                                                            max_generations=100, mutation_chance=0.1,
+                                                            crossover_chance=0.7)
     result: SimpleEquation = ga.run()
     print(result)
+
+# Generation 0 Best -243 Avg -4242.05
+# Generation 1 Best -243 Avg -1141.8
+# Generation 2 Best 4 Avg -261.85
+# Generation 3 Best 4 Avg -131.95
+# Generation 4 Best 9 Avg 5.45
+# Generation 5 Best 9 Avg 8
+# Generation 6 Best 9 Avg 8.2
+# Generation 7 Best 9 Avg 8.5
+# Generation 8 Best 9 Avg 9
+# Generation 9 Best 9 Avg 9
+# Generation 10 Best 12 Avg 8.5
+# Generation 11 Best 12 Avg 9
+# X: 3 Y: 2 Fitness: 13
+
+# 不需要100次迭代，即可达到阈值

@@ -27,9 +27,12 @@ def total_weight(wp: WeightedPath) -> float:
 
 
 def mst(wg: WeightedGraph[V], start: int = 0) -> Optional[WeightedPath]:
+    # start 这个点的index如果无效，直接返回
     if start > (wg.vertex_count - 1) or start < 0:
         return None
+
     result: WeightedPath = [] # holds the final MST
+    # 因为优先队列是以升序排列的，所以会先弹出权重最小的边。这就确保了结果确实具有最小总权重
     pq: PriorityQueue[WeightedEdge] = PriorityQueue()
     visited: List[bool] = [False] * wg.vertex_count # where we've been
 

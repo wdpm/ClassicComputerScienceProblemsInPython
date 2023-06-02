@@ -39,6 +39,7 @@ if __name__ == "__main__":
         elif board.is_draw:
             print("Draw!")
             break
+
         computer_move: Move = find_best_move(board)
         print(f"Computer move is {computer_move}")
         board = board.move(computer_move)
@@ -50,4 +51,7 @@ if __name__ == "__main__":
             print("Draw!")
             break
 
-
+# 井字棋最多只能走9步，因为玩家先走了一步，剩下的只是8步。
+# 此AI是后手。AI分析的深度为8
+# XO XO XO XO X
+# 理论上AI不会输棋

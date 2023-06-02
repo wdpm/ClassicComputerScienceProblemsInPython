@@ -16,6 +16,13 @@
 
 
 def fib2(n: int) -> int:
+    """
+    该函数使用如果 n 小于 2 则返回 n 的基本情况递归地计算第 n 个斐波纳契数，否则返回第 (n-2) 个和第 (n-1) 个斐波纳契数之和。
+
+    :param n: 参数“n”是一个整数，表示所需数字在斐波那契数列中的位置。
+    :type n: int
+    :return: 函数“fib2”返回第 n 个斐波那契数，其中 n 是输入参数。
+    """
     if n < 2:  # base case
         return n
     return fib2(n - 2) + fib2(n - 1)  # recursive case

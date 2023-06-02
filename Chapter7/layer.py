@@ -29,6 +29,7 @@ class Layer:
             if previous_layer is None:
                 random_weights: List[float] = []
             else:
+                # 当前层某个神经元的权重，由上一层的神经元数量决定，保持一致
                 random_weights = [random() for _ in range(len(previous_layer.neurons))]
             neuron: Neuron = Neuron(random_weights, learning_rate, activation_function, derivative_activation_function)
             self.neurons.append(neuron)

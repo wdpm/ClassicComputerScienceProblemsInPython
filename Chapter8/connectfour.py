@@ -38,9 +38,19 @@ class C4Piece(Piece, Enum):
 
 
 def generate_segments(num_columns: int, num_rows: int, segment_length: int) -> List[List[Tuple[int, int]]]:
+    """
+    每个子列表包含4个网格方位。这4个网格方位组成的列表被称为一个区段.
+    Tuple[int, int] 表示的是(列，行)，而不是(行，列)。注意顺序。
+    :param num_columns:
+    :param num_rows:
+    :param segment_length:
+    :return:
+    """
     segments: List[List[Tuple[int, int]]] = []
     # generate the vertical segments
+    # column: [0...col-1] => 特定列
     for c in range(num_columns):
+        # row: [0,rows-seg+1) 注意右括号是不包含 => 特定列的垂直移动。
         for r in range(num_rows - segment_length + 1):
             segment: List[Tuple[int, int]] = []
             for t in range(segment_length):
@@ -55,7 +65,7 @@ def generate_segments(num_columns: int, num_rows: int, segment_length: int) -> L
                 segment.append((c + t, r))
             segments.append(segment)
 
-    # generate the bottom left to top right diagonal segments
+    # generate the top left to bottom right diagonal segments
     for c in range(num_columns - segment_length + 1):
         for r in range(num_rows - segment_length + 1):
             segment = []
@@ -63,7 +73,7 @@ def generate_segments(num_columns: int, num_rows: int, segment_length: int) -> L
                 segment.append((c + t, r + t))
             segments.append(segment)
 
-    # generate the top left to bottom right diagonal segments
+    # generate the bottom left to top right diagonal segments
     for c in range(num_columns - segment_length + 1):
         for r in range(segment_length - 1, num_rows):
             segment = []
@@ -118,8 +128,10 @@ class C4Board(Board):
 
     def move(self, location: Move) -> Board:
         temp_position: List[C4Board.Column] = self.position.copy()
+        # 这里为何需要分别复制每个列，上面的position.copy不足够，担心共享最外层的List引用
         for c in range(C4Board.NUM_COLUMNS):
             temp_position[c] = self.position[c].copy()
+
         temp_position[location].push(self._turn)
         return C4Board(temp_position, self._turn.opposite)
 
@@ -150,6 +162,8 @@ class C4Board(Board):
         black_count, red_count = self._count_segment(segment)
         if red_count > 0 and black_count > 0:
             return 0 # mixed segments are neutral
+
+        # 这里要么只有红，要么只有黑
         count: int = max(red_count, black_count)
         score: float = 0
         if count == 2:
@@ -158,11 +172,16 @@ class C4Board(Board):
             score = 100
         elif count == 4:
             score = 1000000
+
+        # 得到当前color
         color: C4Piece = C4Piece.B
         if red_count > black_count:
             color = C4Piece.R
+
+        # 如果颜色变量与当前玩家不匹配（即评估的线段颜色与当前玩家颜色不一致），则返回负的评分值，表示这个线段对当前玩家不利
         if color != player:
             return -score
+
         return score
 
     def evaluate(self, player: Piece) -> float:
@@ -173,6 +192,7 @@ class C4Board(Board):
 
     def __repr__(self) -> str:
         display: str = ""
+        # 为何reverse rows，这是为了符合人的思维习惯，将棋盘底部视为开始位置，作为一个view。上面的计算都是将顶部视为棋盘开始位置的。
         for r in reversed(range(C4Board.NUM_ROWS)):
             display += "|"
             for c in range(C4Board.NUM_COLUMNS):

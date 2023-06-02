@@ -20,9 +20,15 @@ from abc import ABC, abstractmethod
 Move = NewType('Move', int)
 
 
+# Piece 是一个基类，用于表示游戏棋盘上的棋子。
+# Piece 还兼有回合指示器的作用，因此它需要带有 opposite 属性。我们必须知道给定回合之后该轮到谁走棋了
 class Piece:
     @property
     def opposite(self) -> Piece:
+        """
+        表示下一个回合该走的棋子是什么类型，例如井字棋，如果当前是O，那么下一个回合就是X
+        :return:
+        """
         raise NotImplementedError("Should be implemented by subclasses.")
 
 
@@ -39,6 +45,11 @@ class Board(ABC):
     @property
     @abstractmethod
     def legal_moves(self) -> List[Move]:
+        """
+        剩余可以合法走的步骤，长度为 0 表示棋局结束
+
+        :return:
+        """
         ...
 
     @property
@@ -52,5 +63,10 @@ class Board(ABC):
 
     @abstractmethod
     def evaluate(self, player: Piece) -> float:
+        """
+        评估当前位置，看看哪位玩家占据了优势
+        :param player: 
+        :return: 
+        """
         ...
 

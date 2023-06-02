@@ -45,8 +45,13 @@ vt_distances: Dict[str, Dict[str, int]] = {
 }
 
 vt_cities: Iterable[str] = vt_distances.keys()
+# 为城市列表生成全部排列,时间复杂度N！
 city_permutations: Iterable[Tuple[str, ...]] = permutations(vt_cities)
+# c + (c[0],) 是为了补充回到原点这一段路，得到环路
 tsp_paths: List[Tuple[str, ...]] = [c + (c[0],) for c in city_permutations]
+
+print(tsp_paths[0])
+# ('Rutland', 'Burlington', 'White River Junction', 'Bennington', 'Brattleboro', 'Rutland')
 
 if __name__ == "__main__":
     best_path: Tuple[str, ...]

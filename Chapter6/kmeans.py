@@ -26,7 +26,7 @@ from data_point import DataPoint
 def zscores(original: Sequence[float]) -> List[float]:
     avg: float = mean(original)
     std: float = pstdev(original)
-    if std == 0: # return all zeros if there is no variation
+    if std == 0:  # return all zeros if there is no variation
         return [0] * len(original)
     return [(x - avg) / std for x in original]
 
@@ -38,33 +38,54 @@ class KMeans(Generic[Point]):
     @dataclass
     class Cluster:
         points: List[Point]
-        centroid: DataPoint
+        centroid: DataPoint  # 形心
 
     def __init__(self, k: int, points: List[Point]) -> None:
-        if k < 1: # k-means can't do negative or zero clusters
+        if k < 1:  # k-means can't do negative or zero clusters
             raise ValueError("k must be >= 1")
         self._points: List[Point] = points
         self._zscore_normalize()
         # initialize empty clusters with random centroids
         self._clusters: List[KMeans.Cluster] = []
         for _ in range(k):
+            # 这里初始化的形心是随机的，也可以扩展API给用户来指定
+
+            # k-means++（k 均值++）就是一种比较流行的变体算法，它不是完全随机地选择形心，而是基于到各点距离的
+            # 概率分布来选择形心，以解决形心初始化的问题。对很多应用程序而言，更好的选择是根据提前知晓的数据信息选择合适的起始区域，
+            # 以获取各个形心值。换句话说，这种k均值聚类算法是由用户来选取初始的各个形心。
+
             rand_point: DataPoint = self._random_point()
             cluster: KMeans.Cluster = KMeans.Cluster([], rand_point)
             self._clusters.append(cluster)
 
     @property
     def _centroids(self) -> List[DataPoint]:
+        """
+        此函数返回表示集群质心的 DataPoint 对象列表。
+        """
         return [x.centroid for x in self._clusters]
 
     def _dimension_slice(self, dimension: int) -> List[float]:
+        """
+        取数据点的某个维度，返回这个维度组成的列表
+        :param dimension:
+        :return:
+        """
         return [x.dimensions[dimension] for x in self._points]
 
     def _zscore_normalize(self) -> None:
+        """
+        计算每个数据点的 zscore dimensions
+        :return:
+        """
         zscored: List[List[float]] = [[] for _ in range(len(self._points))]
+
         for dimension in range(self._points[0].num_dimensions):
             dimension_slice: List[float] = self._dimension_slice(dimension)
             for index, zscore in enumerate(zscores(dimension_slice)):
+                # index: [0...len(self._points)-1]
                 zscored[index].append(zscore)
+
         for i in range(len(self._points)):
             self._points[i].dimensions = tuple(zscored[i])
 
@@ -79,6 +100,8 @@ class KMeans(Generic[Point]):
     # Find the closest cluster centroid to each point and assign the point to that cluster
     def _assign_clusters(self) -> None:
         for point in self._points:
+            # 迭代 _centroids 数组的每一个元素，求出每个形心到数据点point的距离，
+            # min是求出某个点point距离哪个形心最近
             closest: DataPoint = min(self._centroids, key=partial(DataPoint.distance, point))
             idx: int = self._centroids.index(closest)
             cluster: KMeans.Cluster = self._clusters[idx]
@@ -87,22 +110,26 @@ class KMeans(Generic[Point]):
     # Find the center of each cluster and move the centroid to there
     def _generate_centroids(self) -> None:
         for cluster in self._clusters:
-            if len(cluster.points) == 0: # keep the same centroid if no points
+            if len(cluster.points) == 0:  # keep the same centroid if no points
                 continue
             means: List[float] = []
             for dimension in range(cluster.points[0].num_dimensions):
+                # 注意，此处不能使用_dimension_slice()，因为当前这些数据点只是全部数据点的子集（仅归属于某聚类簇的点）:cluster.points
                 dimension_slice: List[float] = [p.dimensions[dimension] for p in cluster.points]
+                # 形心的计算公式=（所有X维度的平均，Y维度的平均，Z维度的平均，......以此类推到所有维度）
                 means.append(mean(dimension_slice))
+
             cluster.centroid = DataPoint(means)
 
     def run(self, max_iterations: int = 100) -> List[KMeans.Cluster]:
         for iteration in range(max_iterations):
-            for cluster in self._clusters: # clear all clusters
+            for cluster in self._clusters:  # clear all clusters
                 cluster.points.clear()
-            self._assign_clusters() # find cluster each point is closest to
-            old_centroids: List[DataPoint] = deepcopy(self._centroids) # record
-            self._generate_centroids() # find new centroids
-            if old_centroids == self._centroids: # have centroids moved?
+            self._assign_clusters()  # find cluster each point is closest to
+            old_centroids: List[DataPoint] = deepcopy(self._centroids)  # record
+            self._generate_centroids()  # find new centroids
+            if old_centroids == self._centroids:  # have centroids moved?
+                # 如果到这里，说明形心不再移动，认为是已经收敛
                 print(f"Converged after {iteration} iterations")
                 return self._clusters
         return self._clusters

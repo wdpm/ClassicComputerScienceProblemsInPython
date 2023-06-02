@@ -34,7 +34,16 @@ def encrypt(original: str) -> Tuple[int, int]:
 
 def decrypt(key1: int, key2: int) -> str:
     decrypted: int = key1 ^ key2  # XOR
+    # 在用整除操作（//）除以8之前，必须给解密数据的长度加上7，以确保
+    # 能“向上舍入”，避免出现边界差一（off-by-one）错误。如果上述一次性密码
+    # 本的加密过程确实有效，应该就能毫无问题地加密和解密Unicode字符串了
     temp: bytes = decrypted.to_bytes((decrypted.bit_length() + 7) // 8, "big")
+
+    # here why not use (decrypted.bit_length() / 8)
+    # '0b100101' => 6 bit, 1 byte,
+    # 6/8 => 0
+    # (6+7)//8 => 1 后可以修复这个问题。1~7范围的bit都可以得出: ([1-8]+7)//8 => 1
+    # temp: bytes = decrypted.to_bytes(int(decrypted.bit_length() / 8), "big")
     return temp.decode()
 
 

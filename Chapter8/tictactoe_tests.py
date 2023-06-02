@@ -46,10 +46,8 @@ class TTTMinimaxTestCase(unittest.TestCase):
                                                 TTTPiece.O, TTTPiece.X, TTTPiece.E]
         test_board3: TTTBoard = TTTBoard(to_win_hard_position, TTTPiece.X)
         answer3: Move = find_best_move(test_board3)
+        # position 1 这一步已经奠定了后续的赢局，O无法阻挡
         self.assertEqual(answer3, 1)
-
 
 if __name__ == '__main__':
     unittest.main()
-
-

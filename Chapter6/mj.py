@@ -24,7 +24,9 @@ class Album(DataPoint):
         super().__init__([length, tracks])
         self.name = name
         self.year = year
+        # 辑长度 minutes
         self.length = length
+        # 歌曲数量
         self.tracks = tracks
 
     def __repr__(self) -> str:

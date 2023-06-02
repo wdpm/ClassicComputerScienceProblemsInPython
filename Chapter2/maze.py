@@ -34,7 +34,8 @@ class MazeLocation(NamedTuple):
 
 
 class Maze:
-    def __init__(self, rows: int = 10, columns: int = 10, sparseness: float = 0.2, start: MazeLocation = MazeLocation(0, 0), goal: MazeLocation = MazeLocation(9, 9)) -> None:
+    def __init__(self, rows: int = 10, columns: int = 10, sparseness: float = 0.2,
+                 start: MazeLocation = MazeLocation(0, 0), goal: MazeLocation = MazeLocation(9, 9)) -> None:
         # initialize basic instance variables
         self._rows: int = rows
         self._columns: int = columns
@@ -81,7 +82,7 @@ class Maze:
             self._grid[maze_location.row][maze_location.column] = Cell.PATH
         self._grid[self.start.row][self.start.column] = Cell.START
         self._grid[self.goal.row][self.goal.column] = Cell.GOAL
-    
+
     def clear(self, path: List[MazeLocation]):
         for maze_location in path:
             self._grid[maze_location.row][maze_location.column] = Cell.EMPTY
@@ -94,21 +95,32 @@ def euclidean_distance(goal: MazeLocation) -> Callable[[MazeLocation], float]:
         xdist: int = ml.column - goal.column
         ydist: int = ml.row - goal.row
         return sqrt((xdist * xdist) + (ydist * ydist))
+
     return distance
 
 
 def manhattan_distance(goal: MazeLocation) -> Callable[[MazeLocation], float]:
+    """
+    manhattan distance：不会存在对角线 / 斜线距离，而是直来直去，路径夹角都是 90% 垂直的。
+    明显，在这个基础的迷宫例子中，manhattan距离更加合理。
+
+    :param goal: 
+    :return: 
+    """
+
     def distance(ml: MazeLocation) -> float:
         xdist: int = abs(ml.column - goal.column)
         ydist: int = abs(ml.row - goal.row)
         return (xdist + ydist)
+
     return distance
 
 
 if __name__ == "__main__":
-    # Test DFS
     m: Maze = Maze()
     print(m)
+
+    # Test DFS
     solution1: Optional[Node[MazeLocation]] = dfs(m.start, m.goal_test, m.successors)
     if solution1 is None:
         print("No solution found using depth-first search!")
@@ -116,7 +128,9 @@ if __name__ == "__main__":
         path1: List[MazeLocation] = node_to_path(solution1)
         m.mark(path1)
         print(m)
+        print(f'dfs path size: {len(path1)}')
         m.clear(path1)
+
     # Test BFS
     solution2: Optional[Node[MazeLocation]] = bfs(m.start, m.goal_test, m.successors)
     if solution2 is None:
@@ -124,8 +138,10 @@ if __name__ == "__main__":
     else:
         path2: List[MazeLocation] = node_to_path(solution2)
         m.mark(path2)
+        print(f'bfs path size: {len(path2)}')
         print(m)
         m.clear(path2)
+
     # Test A*
     distance: Callable[[MazeLocation], float] = manhattan_distance(m.goal)
     solution3: Optional[Node[MazeLocation]] = astar(m.start, m.goal_test, m.successors, distance)
@@ -134,4 +150,5 @@ if __name__ == "__main__":
     else:
         path3: List[MazeLocation] = node_to_path(solution3)
         m.mark(path3)
+        print(f'A* path size: {len(path3)}')
         print(m)

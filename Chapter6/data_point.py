@@ -20,7 +20,9 @@ from math import sqrt
 
 class DataPoint:
     def __init__(self, initial: Iterable[float]) -> None:
+        # 持有原来的副本，方便打印
         self._originals: Tuple[float, ...] = tuple(initial)
+        # 一个数组，用于操作处理
         self.dimensions: Tuple[float, ...] = tuple(initial)
 
     @property

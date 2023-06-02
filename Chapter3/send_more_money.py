@@ -24,6 +24,7 @@ class SendMoreMoneyConstraint(Constraint[str, int]):
 
     def satisfied(self, assignment: Dict[str, int]) -> bool:
         # if there are duplicate values then it's not a solution
+        # 是否存在多个字母代表同一个数字的情况，如果存在则说明那是一个无效解
         if len(set(assignment.values())) < len(assignment):
             return False
 
@@ -49,6 +50,7 @@ if __name__ == "__main__":
     possible_digits: Dict[str, List[int]] = {}
     for letter in letters:
         possible_digits[letter] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
     possible_digits["M"] = [1]  # so we don't get answers starting with a 0
     csp: CSP[str, int] = CSP(letters, possible_digits)
     csp.add_constraint(SendMoreMoneyConstraint(letters))

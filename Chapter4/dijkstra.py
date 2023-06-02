@@ -55,6 +55,8 @@ def dijkstra(wg: WeightedGraph[V], root: V) -> Tuple[List[Optional[float]], Dict
             # no old distance or found shorter path
             if dist_v is None or dist_v > we.weight + dist_u:
                 # update distance to this vertex
+                # dist_u = distance(root -> u)
+                # we.weight = distance(u -> v)
                 distances[we.v] = we.weight + dist_u
                 # update the edge on the shortest path to this vertex
                 path_dict[we.v] = we

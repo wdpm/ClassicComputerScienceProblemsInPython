@@ -16,6 +16,12 @@
 
 
 def calculate_pi(n_terms: int) -> float:
+    """
+    4/1 - 4/3 + 4/5 -4/7 + 4/11 - ...
+
+    :param n_terms:
+    :return:
+    """
     numerator: float = 4.0
     denominator: float = 1.0
     operation: float = 1.0
@@ -28,4 +34,6 @@ def calculate_pi(n_terms: int) -> float:
 
 
 if __name__ == "__main__":
-    print(calculate_pi(1000000))
+    print(calculate_pi(10000000))
+
+# 3.1415916535897743
